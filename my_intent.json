@@ -1,222 +1,216 @@
 {
-  "networkName": "Projet BGP",
-  "ASes": [
-      {
-          "asn": 65001,
-          "igp": "RIP",
-          "routers": [
-              {
-                  "name": "R1",
-                  "hostname": "R1",
-                  "routerID": "1.1.1.1",
-                  "loopbacks": [
-                      {
-                          "name": "Loopback0",
-                          "ipv6": "2001:1:1::1/128"
-                      }
-                  ],
-                  "interfaces": [
-                      {
-                          "name": "FastEthernet0/0",
-                          "ipv6": "2001:1:12::1/64",
-                          "description": "Lien vers R2",
-                          "igpEnabled": true
-                      },
-                      {
-                          "name": "GigabitEthernet1/0",
-                          "ipv6": "2001:1:14::1/64",
-                          "description": "Lien eBGP vers R4 (AS 65002)",
-                          "igpEnabled": false
-                      }
-                  ],
-                  "bgpNeighbors": [
-                      {
-                          "neighborIPv6": "2001:1:14::4",
-                          "remoteAs": 65002,
-                          "ebgp": true
-                      },
-                      {
-                          "neighborIPv6": "2001:1:2::1",
-                          "remoteAs": 65001,
-                          "ebgp": false
-                      }
-                  ]
-              },
-              {
-                  "name": "R2",
-                  "hostname": "R2",
-                  "routerID": "2.2.2.2",
-                  "loopbacks": [
-                      {
-                          "name": "Loopback0",
-                          "ipv6": "2001:1:2::1/128"
-                      }
-                  ],
-                  "interfaces": [
-                      {
-                          "name": "FastEthernet0/0",
-                          "ipv6": "2001:1:12::2/64",
-                          "description": "Lien vers R1",
-                          "igpEnabled": true
-                      },
-                      {
-                          "name": "GigabitEthernet1/0",
-                          "ipv6": "2001:1:23::2/64",
-                          "description": "Lien vers R3",
-                          "igpEnabled": true
-                      }
-                  ],
-                  "bgpNeighbors": [
-                      {
-                          "neighborIPv6": "2001:1:1::1",
-                          "remoteAs": 65001,
-                          "ebgp": false
-                      },
-                      {
-                          "neighborIPv6": "2001:1:3::1",
-                          "remoteAs": 65001,
-                          "ebgp": false
-                      }
-                  ]
-              },
-              {
-                  "name": "R3",
-                  "hostname": "R3",
-                  "routerID": "3.3.3.3",
-                  "loopbacks": [
-                      {
-                          "name": "Loopback0",
-                          "ipv6": "2001:1:3::1/128"
-                      }
-                  ],
-                  "interfaces": [
-                      {
-                          "name": "FastEthernet0/0",
-                          "ipv6": "2001:1:23::3/64",
-                          "description": "Lien vers R2",
-                          "igpEnabled": true
-                      }
-                  ],
-                  "bgpNeighbors": [
-                      {
-                          "neighborIPv6": "2001:1:2::1",
-                          "remoteAs": 65001,
-                          "ebgp": false
-                      }
-                  ]
-              }
-          ]
-      },
-      {
-          "asn": 65002,
-          "igp": "OSPF",
-          "routers": [
-              {
-                  "name": "R4",
-                  "hostname": "R4",
-                  "routerID": "4.4.4.4",
-                  "loopbacks": [
-                      {
-                          "name": "Loopback0",
-                          "ipv6": "2001:1:4::1/128"
-                      }
-                  ],
-                  "interfaces": [
-                      {
-                          "name": "FastEthernet0/0",
-                          "ipv6": "2001:1:14::4/64",
-                          "description": "Lien eBGP vers R1 (AS 65001)",
-                          "igpEnabled": false
-                      },
-                      {
-                          "name": "GigabitEthernet1/0",
-                          "ipv6": "2001:1:45::4/64",
-                          "description": "Lien vers R5",
-                          "igpEnabled": true
-                      }
-                  ],
-                  "bgpNeighbors": [
-                      {
-                          "neighborIPv6": "2001:1:14::1",
-                          "remoteAs": 65001,
-                          "ebgp": true
-                      },
-                      {
-                          "neighborIPv6": "2001:1:5::1",
-                          "remoteAs": 65002,
-                          "ebgp": false
-                      }
-                  ]
-              },
-              {
-                  "name": "R5",
-                  "hostname": "R5",
-                  "routerID": "5.5.5.5",
-                  "loopbacks": [
-                      {
-                          "name": "Loopback0",
-                          "ipv6": "2001:1:5::1/128"
-                      }
-                  ],
-                  "interfaces": [
-                      {
-                          "name": "FastEthernet0/0",
-                          "ipv6": "2001:1:45::5/64",
-                          "description": "Lien vers R4",
-                          "igpEnabled": true
-                      },
-                      {
-                          "name": "GigabitEthernet1/0",
-                          "ipv6": "2001:1:56::5/64",
-                          "description": "Lien vers R6",
-                          "igpEnabled": true
-                      }
-                  ],
-                  "bgpNeighbors": [
-                      {
-                          "neighborIPv6": "2001:1:4::1",
-                          "remoteAs": 65002,
-                          "ebgp": false
-                      },
-                      {
-                          "neighborIPv6": "2001:1:6::1",
-                          "remoteAs": 65002,
-                          "ebgp": false
-                      }
-                  ]
-              },
-              {
-                  "name": "R6",
-                  "hostname": "R6",
-                  "routerID": "6.6.6.6",
-                  "loopbacks": [
-                      {
-                          "name": "Loopback0",
-                          "ipv6": "2001:1:6::1/128"
-                      }
-                  ],
-                  "interfaces": [
-                      {
-                          "name": "FastEthernet0/0",
-                          "ipv6": "2001:1:56::6/64",
-                          "description": "Lien vers R5",
-                          "igpEnabled": true
-                      }
-                  ],
-                  "bgpNeighbors": [
-                      {
-                          "neighborIPv6": "2001:1:4::1",
-                          "remoteAs": 65002,
-                          "ebgp": false
-                      },
-                      {
-                          "neighborIPv6": "2001:1:5::1",
-                          "remoteAs": 65002,
-                          "ebgp": false
-                      }
-                  ]
-              }
-          ]
-      }
-  ]
+    "networkName": "Projet BGP",
+    "ASes": [
+        {
+            "asn": 65001,
+            "igp": "RIP",
+            "routers": [
+                {
+                    "name": "R1",
+                    "hostname": "R1",
+                    "routerID": "1.1.1.1",
+                    "loopbacks": [
+                        {
+                            "name": "Loopback0"
+                        }
+                    ],
+                    "interfaces": [
+                        {
+                            "name": "FastEthernet0/0",
+                            "description": "Lien vers R2",
+                            "connectedTo": "R2:FastEthernet0/0",
+                            "igpEnabled": true
+                        },
+                        {
+                            "name": "GigabitEthernet1/0",
+                            "description": "Lien eBGP vers R4",
+                            "connectedTo": "R4:FastEthernet0/0",
+                            "igpEnabled": false
+                        }
+                    ],
+                    "bgpNeighbors": [
+                        {
+                            "neighbor": "R4",
+                            "remoteAs": 65002,
+                            "relationship": "eBGP"
+                        },
+                        {
+                            "neighbor": "R2",
+                            "remoteAs": 65001,
+                            "relationship": "iBGP"
+                        }
+                    ]
+                },
+                {
+                    "name": "R2",
+                    "hostname": "R2",
+                    "routerID": "2.2.2.2",
+                    "loopbacks": [
+                        {
+                            "name": "Loopback0"
+                        }
+                    ],
+                    "interfaces": [
+                        {
+                            "name": "FastEthernet0/0",
+                            "description": "Lien vers R1",
+                            "connectedTo": "R1:FastEthernet0/0",
+                            "igpEnabled": true
+                        },
+                        {
+                            "name": "GigabitEthernet1/0",
+                            "description": "Lien vers R3",
+                            "connectedTo": "R3:FastEthernet0/0",
+                            "igpEnabled": true
+                        }
+                    ],
+                    "bgpNeighbors": [
+                        {
+                            "neighbor": "R1",
+                            "remoteAs": 65001,
+                            "relationship": "iBGP"
+                        },
+                        {
+                            "neighbor": "R3",
+                            "remoteAs": 65001,
+                            "relationship": "iBGP"
+                        }
+                    ]
+                },
+                {
+                    "name": "R3",
+                    "hostname": "R3",
+                    "routerID": "3.3.3.3",
+                    "loopbacks": [
+                        {
+                            "name": "Loopback0"
+                        }
+                    ],
+                    "interfaces": [
+                        {
+                            "name": "FastEthernet0/0",
+                            "description": "Lien vers R2",
+                            "connectedTo": "R2:GigabitEthernet1/0",
+                            "igpEnabled": true
+                        }
+                    ],
+                    "bgpNeighbors": [
+                        {
+                            "neighbor": "R2",
+                            "remoteAs": 65001,
+                            "relationship": "iBGP"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "asn": 65002,
+            "igp": "OSPF",
+            "routers": [
+                {
+                    "name": "R4",
+                    "hostname": "R4",
+                    "routerID": "4.4.4.4",
+                    "loopbacks": [
+                        {
+                            "name": "Loopback0"
+                        }
+                    ],
+                    "interfaces": [
+                        {
+                            "name": "FastEthernet0/0",
+                            "description": "Lien eBGP vers R1",
+                            "connectedTo": "R1:GigabitEthernet1/0",
+                            "igpEnabled": false
+                        },
+                        {
+                            "name": "GigabitEthernet1/0",
+                            "description": "Lien vers R5",
+                            "connectedTo": "R5:FastEthernet0/0",
+                            "igpEnabled": true
+                        }
+                    ],
+                    "bgpNeighbors": [
+                        {
+                            "neighbor": "R1",
+                            "remoteAs": 65001,
+                            "relationship": "eBGP"
+                        },
+                        {
+                            "neighbor": "R5",
+                            "remoteAs": 65002,
+                            "relationship": "iBGP"
+                        }
+                    ]
+                },
+                {
+                    "name": "R5",
+                    "hostname": "R5",
+                    "routerID": "5.5.5.5",
+                    "loopbacks": [
+                        {
+                            "name": "Loopback0"
+                        }
+                    ],
+                    "interfaces": [
+                        {
+                            "name": "FastEthernet0/0",
+                            "description": "Lien vers R4",
+                            "connectedTo": "R4:GigabitEthernet1/0",
+                            "igpEnabled": true
+                        },
+                        {
+                            "name": "GigabitEthernet1/0",
+                            "description": "Lien vers R6",
+                            "connectedTo": "R6:FastEthernet0/0",
+                            "igpEnabled": true
+                        }
+                    ],
+                    "bgpNeighbors": [
+                        {
+                            "neighbor": "R4",
+                            "remoteAs": 65002,
+                            "relationship": "iBGP"
+                        },
+                        {
+                            "neighbor": "R6",
+                            "remoteAs": 65002,
+                            "relationship": "iBGP"
+                        }
+                    ]
+                },
+                {
+                    "name": "R6",
+                    "hostname": "R6",
+                    "routerID": "6.6.6.6",
+                    "loopbacks": [
+                        {
+                            "name": "Loopback0"
+                        }
+                    ],
+                    "interfaces": [
+                        {
+                            "name": "FastEthernet0/0",
+                            "description": "Lien vers R5",
+                            "connectedTo": "R5:GigabitEthernet1/0",
+                            "igpEnabled": true
+                        }
+                    ],
+                    "bgpNeighbors": [
+                        {
+                            "neighbor": "R4",
+                            "remoteAs": 65002,
+                            "relationship": "iBGP"
+                        },
+                        {
+                            "neighbor": "R5",
+                            "remoteAs": 65002,
+                            "relationship": "iBGP"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 }
