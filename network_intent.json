@@ -1,0 +1,56 @@
+{
+    "networkName": "Projet BGP",
+    "addressFamily": "ipv6",
+    "subnetAllocation": {
+        "basePrefix": "2001:db8::/32",
+        "asAllocation": {
+            "65001": {
+                "physicalRange": "2001:db8:1::/48",
+                "loopbackRange": "2001:db8:2::/48"
+            },
+            "65002": {
+                "physicalRange": "2001:db8:3::/48",
+                "loopbackRange": "2001:db8:4::/48"
+            }
+        }
+    },
+    "ASes": [
+        {
+            "asn": 65001,
+            "igp": {
+                "type": "RIP",
+                "version": "ng"
+            },
+            "topology": {
+                "links": [
+                    ["R1:FastEthernet0/0", "R2:FastEthernet0/0"],
+                    ["R2:GigabitEthernet1/0", "R3:FastEthernet0/0"],
+                    ["R1:GigabitEthernet1/0", "R4:FastEthernet0/0", "interAS"]
+                ]
+            },
+            "routers": {
+                "R1": { "loopbacks": 1, "bgp": { "iBGPpeers": ["R2"], "eBGPpeers": ["R4"] } },
+                "R2": { "loopbacks": 1, "bgp": { "iBGPpeers": ["R1", "R3"] } },
+                "R3": { "loopbacks": 1, "bgp": { "iBGPpeers": ["R2"] } }
+            }
+        },
+        {
+            "asn": 65002,
+            "igp": {
+                "type": "OSPF",
+                "area": "0.0.0.0"
+            },
+            "topology": {
+                "links": [
+                    ["R4:GigabitEthernet1/0", "R5:FastEthernet0/0"],
+                    ["R5:GigabitEthernet1/0", "R6:FastEthernet0/0"]
+                ]
+            },
+            "routers": {
+                "R4": { "loopbacks": 1, "bgp": { "iBGPpeers": ["R5"], "eBGPpeers": ["R1"] } },
+                "R5": { "loopbacks": 1, "bgp": { "iBGPpeers": ["R4", "R6"] } },
+                "R6": { "loopbacks": 1, "bgp": { "iBGPpeers": ["R5"] } }
+            }
+        }
+    ]
+}
