@@ -82,6 +82,7 @@ class NetworkAutomator:
             
             if iface_name not in configured_interfaces:
                 config.append(f"interface {iface_name}")
+                config.append(f" no ip address")
                 config.append(f" ipv6 address {ipv6_addr}")
 
                 if iface_name.startswith("FastEthernet"):

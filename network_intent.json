@@ -43,7 +43,8 @@
             "topology": {
                 "links": [
                     ["R4:GigabitEthernet1/0", "R5:FastEthernet0/0"],
-                    ["R5:GigabitEthernet1/0", "R6:FastEthernet0/0"]
+                    ["R5:GigabitEthernet1/0", "R6:FastEthernet0/0"],
+                    ["R4:FastEthernet0/0", "R6:GigabitEthernet1/0", "interAS"]
                 ]
             },
             "routers": {
