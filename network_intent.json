@@ -23,15 +23,52 @@
             },
             "topology": {
                 "links": [
-                    ["R1:FastEthernet0/0", "R2:FastEthernet0/0"],
-                    ["R2:GigabitEthernet1/0", "R3:FastEthernet0/0"],
-                    ["R1:GigabitEthernet1/0", "R4:FastEthernet0/0", "interAS"]
+                    ["R1:FastEthernet0/0", "R3:FastEthernet0/0"],
+                    ["R1:GigabitEthernet1/0", "R4:GigabitEthernet1/0"],
+                    ["R1:GigabitEthernet2/0", "R6:GigabitEthernet2/0", "interAS"],
+
+                    ["R2:FastEthernet0/0", "R3:GigabitEthernet1/0"],
+                    ["R2:GigabitEthernet1/0", "R4:GigabitEthernet2/0"],
+                    ["R2:GigabitEthernet2/0", "R7:GigabitEthernet2/0", "interAS"],
+
+                    ["R3:GigabitEthernet2/0", "R4:GigabitEthernet3/0"],
+                    ["R3:GigabitEthernet3/0", "R5:FastEthernet0/0"],
+                    ["R4:FastEthernet0/0", "R5:GigabitEthernet1/0"]
                 ]
             },
             "routers": {
-                "R1": { "loopbacks": 1, "bgp": { "iBGPpeers": ["R2"], "eBGPpeers": ["R4"] } },
-                "R2": { "loopbacks": 1, "bgp": { "iBGPpeers": ["R1", "R3"] } },
-                "R3": { "loopbacks": 1, "bgp": { "iBGPpeers": ["R2"] } }
+                "R1": {
+                    "loopbacks": 1,
+                    "bgp": {
+                        "iBGPpeers": ["R2", "R3", "R4", "R5"],
+                        "eBGPpeers": ["R6"]
+                    }
+                },
+                "R2": {
+                    "loopbacks": 1,
+                    "bgp": {
+                        "iBGPpeers": ["R1", "R3", "R4", "R5"],
+                        "eBGPpeers": ["R7"]
+                    }
+                },
+                "R3": {
+                    "loopbacks": 1,
+                    "bgp": {
+                        "iBGPpeers": ["R1", "R2", "R4", "R5"]
+                    }
+                },
+                "R4": {
+                    "loopbacks": 1,
+                    "bgp": {
+                        "iBGPpeers": ["R1", "R2", "R3", "R5"]
+                    }
+                },
+                "R5": {
+                    "loopbacks": 1,
+                    "bgp": {
+                        "iBGPpeers": ["R1", "R2", "R3", "R4"]
+                    }
+                }
             }
         },
         {
@@ -42,15 +79,48 @@
             },
             "topology": {
                 "links": [
-                    ["R4:GigabitEthernet1/0", "R5:FastEthernet0/0"],
-                    ["R5:GigabitEthernet1/0", "R6:FastEthernet0/0"],
-                    ["R4:FastEthernet0/0", "R6:GigabitEthernet1/0", "interAS"]
+                    ["R6:FastEthernet0/0", "R8:FastEthernet0/0"],
+                    ["R6:GigabitEthernet1/0", "R9:FastEthernet0/0"],
+                    ["R7:FastEthernet0/0", "R9:GigabitEthernet1/0"],
+                    ["R7:GigabitEthernet1/0", "R8:GigabitEthernet1/0"],
+                    ["R8:GigabitEthernet3/0", "R9:GigabitEthernet3/0"],
+                    ["R8:GigabitEthernet2/0", "R10:FastEthernet0/0"],
+                    ["R9:GigabitEthernet2/0", "R10:GigabitEthernet1/0"]
                 ]
             },
             "routers": {
-                "R4": { "loopbacks": 1, "bgp": { "iBGPpeers": ["R5"], "eBGPpeers": ["R1"] } },
-                "R5": { "loopbacks": 1, "bgp": { "iBGPpeers": ["R4", "R6"] } },
-                "R6": { "loopbacks": 1, "bgp": { "iBGPpeers": ["R5"] } }
+                "R6": {
+                    "loopbacks": 1,
+                    "bgp": {
+                        "iBGPpeers": ["R7", "R8", "R9", "R10"],
+                        "eBGPpeers": ["R1"]
+                    }
+                },
+                "R7": {
+                    "loopbacks": 1,
+                    "bgp": {
+                        "iBGPpeers": ["R6", "R8", "R9", "R10"],
+                        "eBGPpeers": ["R2"]
+                    }
+                },
+                "R8": {
+                    "loopbacks": 1,
+                    "bgp": {
+                        "iBGPpeers": ["R6", "R7", "R9", "R10"]
+                    }
+                },
+                "R9": {
+                    "loopbacks": 1,
+                    "bgp": {
+                        "iBGPpeers": ["R6", "R7", "R8", "R10"]
+                    }
+                },
+                "R10": {
+                    "loopbacks": 1,
+                    "bgp": {
+                        "iBGPpeers": ["R6", "R7", "R8", "R9"]
+                    }
+                }
             }
         }
     ]
