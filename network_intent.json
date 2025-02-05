@@ -79,13 +79,13 @@
             },
             "topology": {
                 "links": [
-                    ["R6:FastEthernet0/0", "R8:FastEthernet0/0"],
-                    ["R6:GigabitEthernet1/0", "R9:FastEthernet0/0"],
-                    ["R7:FastEthernet0/0", "R9:GigabitEthernet1/0"],
-                    ["R7:GigabitEthernet1/0", "R8:GigabitEthernet1/0"],
-                    ["R8:GigabitEthernet3/0", "R9:GigabitEthernet3/0"],
-                    ["R8:GigabitEthernet2/0", "R10:FastEthernet0/0"],
-                    ["R9:GigabitEthernet2/0", "R10:GigabitEthernet1/0"]
+                    { "endpoints": ["R6:FastEthernet0/0", "R8:FastEthernet0/0"], "cost": 10 },
+                    { "endpoints": ["R6:GigabitEthernet1/0", "R9:FastEthernet0/0"], "cost": 20 },
+                    { "endpoints": ["R7:FastEthernet0/0", "R9:GigabitEthernet1/0"], "cost": 5 },
+                    { "endpoints": ["R7:GigabitEthernet1/0", "R8:GigabitEthernet1/0"], "cost": 15 },
+                    { "endpoints": ["R8:GigabitEthernet3/0", "R9:GigabitEthernet3/0"], "cost": 0 },
+                    { "endpoints": ["R8:GigabitEthernet2/0", "R10:FastEthernet0/0"], "cost": 8 },
+                    { "endpoints": ["R9:GigabitEthernet2/0", "R10:GigabitEthernet1/0"], "cost": 12 }
                 ]
             },
             "routers": {

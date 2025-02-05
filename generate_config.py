@@ -34,34 +34,26 @@ class NetworkAutomator:
 
             # ---------- Parcourir la topologie de l'AS (liens) ----------
             for link in as_info['topology']['links']:
-                is_inter_as = ('interAS' in link)
+                is_inter_as = False
+                if isinstance(link, dict):  # Gestion du format { "endpoints": [...], "cost": ... }
+                    endpoints = link["endpoints"]
+                else:  # Ancien format (liste simple)
+                    endpoints = link
+
+                is_inter_as = ('interAS' in endpoints)
                 subnet = None
 
                 if is_inter_as:
                     # ---- Lien inter-AS ----
-                    endpoints = []
-                    for item in link:
-                        if item == 'interAS':
-                            continue
-                        router_name = item.split(':')[0]
-                        # Chercher l'AS de ce router_name
-                        for as_entry in self.data['ASes']:
-                            if router_name in as_entry['routers']:
-                                endpoints.append((as_entry['asn'], router_name))
-                                break
-
-                    # Tri pour la clé unique
-                    key = tuple(sorted(endpoints, key=lambda x: (x[0], x[1])))
+                    router_names = [ep.split(':')[0] for ep in endpoints if ep != 'interAS']
+                    key = tuple(sorted(router_names))  # Clé unique pour inter-AS
 
                     if key in self.inter_links:
-                        # On a déjà attribué un subnet pour ces deux routeurs
                         subnet = self.inter_links[key]
                     else:
-                        # Choisir un subnet depuis l'AS "plus petit" dans le tuple
-                        first_asn = key[0][0]
+                        first_asn = next(asn for asn in self.used_subnets if any(r in as_info['routers'] for r in router_names))
                         first_asn_str = str(first_asn)
-                        first_asn_range = IPv6Network(self.data['subnetAllocation']['asAllocation'][first_asn_str]['physicalRange'])
-                        inter_as_subnets = list(first_asn_range.subnets(new_prefix=64))
+                        inter_as_subnets = list(IPv6Network(self.data['subnetAllocation']['asAllocation'][first_asn_str]['physicalRange']).subnets(new_prefix=64))
 
                         for candidate in inter_as_subnets:
                             if candidate not in self.used_subnets[first_asn]:
@@ -72,14 +64,13 @@ class NetworkAutomator:
                         else:
                             raise ValueError(f"Plus de sous-réseaux disponibles pour lien inter-AS {key}")
 
-                    # Créer une entrée interAS_xxx dans ip_allocations
-                    link_id = f"interAS_{'_'.join([r[1] for r in key])}"
+                    link_id = f"interAS_{'_'.join(router_names)}"
                     self.ip_allocations[link_id] = {'subnet': subnet, 'interfaces': {}}
                     host_index = 1
-                    for item in link:
-                        if item == 'interAS':
+                    for ep in endpoints:
+                        if ep == 'interAS':
                             continue
-                        router, iface = item.split(':')
+                        router, iface = ep.split(':')
                         address = subnet.network_address + host_index
                         self.ip_allocations[link_id]['interfaces'][f"{router}:{iface}"] = str(address)
                         host_index += 1
@@ -94,23 +85,20 @@ class NetworkAutomator:
                             subnet_index += 1
                             break
                         subnet_index += 1
+
                     if not subnet:
                         raise ValueError(f"Plus de sous-réseaux /64 disponibles pour AS {asn}")
 
-                # Qu'il soit inter ou intra, on crée aussi l'entrée <asn>_link_<index>
-                link_id = f"{asn_str}_link_{as_info['topology']['links'].index(link)}"
-                self.ip_allocations[link_id] = {
-                    'subnet': subnet,
-                    'interfaces': {}
-                }
-                host_index = 1
-                for item in link:
-                    if item == 'interAS':
-                        continue
-                    router, iface = item.split(':')
-                    address = subnet.network_address + host_index
-                    self.ip_allocations[link_id]['interfaces'][f"{router}:{iface}"] = str(address)
-                    host_index += 1
+                    link_id = f"{asn_str}_link_{as_info['topology']['links'].index(link)}"
+                    self.ip_allocations[link_id] = {'subnet': subnet, 'interfaces': {}}
+
+                    host_index = 1
+                    for ep in endpoints:
+                        router, iface = ep.split(':')
+                        address = subnet.network_address + host_index
+                        self.ip_allocations[link_id]['interfaces'][f"{router}:{iface}"] = str(address)
+                        host_index += 1
+
 
     # ---------------------------------------------------------------------
     #           GENERATION DE LA CONFIG
@@ -216,6 +204,14 @@ class NetworkAutomator:
             for iface in self.get_router_interfaces(as_info['asn'], router):
                 config.append(f"interface {iface['name']}")
                 config.append(" ipv6 ospf 1 area 0")
+
+                # Vérifier si un coût spécifique est défini pour ce lien
+                for link in as_info.get('topology', {}).get('links', []):
+                    if isinstance(link, dict) and 'cost' in link:
+                        if any(router in ep for ep in link["endpoints"]):
+                            cost = link["cost"]
+                            config.append(f" ipv6 ospf cost {cost}")
+
                 config.append("!")
         return config
 
