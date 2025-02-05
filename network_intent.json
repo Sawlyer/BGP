@@ -41,7 +41,17 @@
                     "loopbacks": 1,
                     "bgp": {
                         "iBGPpeers": ["R2", "R3", "R4", "R5"],
-                        "eBGPpeers": ["R6"]
+                        "eBGPpeers": ["R6"],
+                        "policies": {
+                            "neighbors": {
+                                "R6": {
+                                    "relationship": "customer",
+                                    "community": "65001:100",
+                                    "local_pref": 200,
+                                    "filter": "customer-only"
+                                }
+                            }
+                        }
                     }
                 },
                 "R2": {
@@ -93,7 +103,17 @@
                     "loopbacks": 1,
                     "bgp": {
                         "iBGPpeers": ["R7", "R8", "R9", "R10"],
-                        "eBGPpeers": ["R1"]
+                        "eBGPpeers": ["R1"],
+                        "policies": {
+                            "neighbors": {
+                                "R1": {
+                                    "relationship": "provider",
+                                    "community": "65002:300",
+                                    "local_pref": 150,
+                                    "filter": "provider-only"
+                                }
+                            }
+                        }
                     }
                 },
                 "R7": {

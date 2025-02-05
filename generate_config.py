@@ -225,17 +225,15 @@ class NetworkAutomator:
         config.append(f" bgp router-id {router_id}")
         config.append(" address-family ipv6 unicast")
 
-        # -- network ...
+        # -- Réseaux à annoncer --
         networks_to_advertise = set()
         for iface in self.get_router_interfaces(as_info['asn'], router):
             base_ip = iface['ipv6'].split('/')[0]
             if iface['name'].lower().startswith("loopback"):
                 networks_to_advertise.add(base_ip + "/128")
             else:
-                # /64
                 subnet64 = IPv6Network(base_ip + "/64", strict=False)
                 networks_to_advertise.add(str(subnet64))
-
         for net in networks_to_advertise:
             config.append(f"  network {net}")
 
@@ -245,11 +243,9 @@ class NetworkAutomator:
             for peer_name in as_info['routers'][router]['bgp']['iBGPpeers']:
                 peer_loop = self.ip_allocations[f"{asn_str}_{peer_name}"]['loopback']
                 config.append(f"  neighbor {peer_loop} remote-as {as_info['asn']}")
-                # iBGP => update-source Loopback0
                 config.append(f"  neighbor {peer_loop} update-source Loopback0")
                 config.append(f"  neighbor {peer_loop} activate")
-
-            # -- Si on est "rr_server": neighbor X route-reflector-client
+                config.append(f"  neighbor {peer_loop} send-community")
             if rr_server:
                 for peer_name in as_info['routers'][router]['bgp']['iBGPpeers']:
                     peer_loop = self.ip_allocations[f"{asn_str}_{peer_name}"]['loopback']
@@ -258,15 +254,34 @@ class NetworkAutomator:
         # -- eBGP Peers --
         if 'eBGPpeers' in as_info['routers'][router]['bgp']:
             for peer_name in as_info['routers'][router]['bgp']['eBGPpeers']:
-                # Trouver l'AS du peer
                 peer_as_info = next(a for a in self.data['ASes'] if peer_name in a['routers'])
                 peer_asn = peer_as_info['asn']
-                # Adresse physique
                 peer_ip = self.find_ebgp_peer_ip_physical(router, peer_name, asn_str, str(peer_asn))
                 config.append(f"  neighbor {peer_ip} remote-as {peer_asn}")
                 config.append(f"  neighbor {peer_ip} activate")
+                # Gestion des politiques
+                bgp_policies = as_info['routers'][router]['bgp'].get('policies', {})
+                neighbor_policies = bgp_policies.get('neighbors', {})
+                if peer_name in neighbor_policies:
+                    policy = neighbor_policies[peer_name]
+                    community = policy.get("community", "0")
+                    local_pref = policy.get("local_pref", None)
+                    filter_name = policy.get("filter", None)
+                    # Appliquer un route-map sur les routes entrantes pour taguer
+                    if community and community != "0":
+                        config.append(f"  neighbor {peer_ip} route-map TAG_IN in")
+                        # Vous pouvez aussi ajouter la configuration globale du route-map TAG_IN ici
+                        config.append("!")
+                        config.append("route-map TAG_IN permit 10")
+                        config.append(f" set community {community} additive")
+                        if local_pref is not None:
+                            config.append(f" set local-preference {local_pref}")
+                        config.append("!")
+                    # Appliquer un route-map sur les routes sortantes pour filtrer
+                    if filter_name:
+                        config.append(f"  neighbor {peer_ip} route-map {filter_name} out")
 
-        # -- Redistribution de l'IGP dans BGP
+        # -- Redistribution de l'IGP dans BGP --
         igp_type = as_info['igp']['type'].upper()
         if igp_type == "RIP":
             config.append("  redistribute rip RIPng")
@@ -276,6 +291,7 @@ class NetworkAutomator:
         config.append(" exit-address-family")
         config.append("!")
         return config
+
 
     def find_ebgp_peer_ip_physical(self, local_router, peer_router, local_asn_str, peer_asn_str):
         """Trouver l'adresse IPv6 interAS du peer (on évite la loopback)."""
