@@ -5,11 +5,18 @@ import glob
 # Dossier contenant les fichiers générés
 GENERATED_CONFIGS_DIR = os.getcwd()  # Si les fichiers sont dans le dossier courant
 
-# Dossier GNS3 (change-le si besoin)
+# Répertoire GNS3 du projet
 GNS3_PROJECT_DIR = os.path.join(os.getcwd(), "project-files", "dynamips")
 
 # Mapping des routeurs vers leurs fichiers de config GNS3
 def get_gns3_config_files():
+    """
+    Récupère la liste des fichiers de configuration des routeurs dans GNS3.
+
+    :return: dict - Dictionnaire associant l'identifiant du routeur (ex: i2) 
+                    au chemin de son fichier de configuration.
+    """
+
     gns3_configs = {}
     
     # Lister les dossiers dans project-files/dynamips
@@ -31,6 +38,15 @@ def get_gns3_config_files():
 
 # Trouver et remplacer les fichiers de configuration
 def replace_gns3_configs():
+    """
+    Remplace les fichiers de configuration générés par ceux utilisés dans GNS3.
+
+    - Associe chaque routeur généré à son fichier de configuration GNS3.
+    - Copie et remplace les fichiers de configuration correspondants.
+
+    :return: None
+    """
+
     gns3_configs = get_gns3_config_files()
     
     for router_cfg in os.listdir(GENERATED_CONFIGS_DIR):

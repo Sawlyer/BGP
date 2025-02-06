@@ -1,0 +1,35 @@
+Feb 05 10:29:56.201 HYPERVISOR: Release 0.2.17-x86/Windows (tag 2017072410)
+Feb 05 10:29:56.202 HYPERVISOR: Started on IP = localhost, TCP port = 6335.
+Feb 05 10:29:56.710 HYPERVISOR: exec_cmd: hypervisor version 
+Feb 05 10:29:56.710 HYPERVISOR: exec_cmd: hypervisor working_dir C:\Users\Kille\GNS3\projects\ProjetFinalGNS\project-files\dynamips 
+Feb 05 10:29:56.710 GENERAL: working_dir=C:\Users\Kille\GNS3\projects\ProjetFinalGNS\project-files\dynamips
+Feb 05 10:29:56.710 HYPERVISOR: exec_cmd: hypervisor working_dir C:\Users\Kille\GNS3\projects\ProjetFinalGNS\project-files\dynamips\cf456610-a6c2-4463-b263-adf7a564b87e 
+Feb 05 10:29:56.712 GENERAL: working_dir=C:\Users\Kille\GNS3\projects\ProjetFinalGNS\project-files\dynamips\cf456610-a6c2-4463-b263-adf7a564b87e
+Feb 05 10:29:56.712 HYPERVISOR: exec_cmd: vm create R7 7 c7200 
+Feb 05 10:29:56.713 VM: VM R7 created.
+Feb 05 10:29:56.713 HYPERVISOR: exec_cmd: vm set_con_tcp_port R7 5006 
+Feb 05 10:29:56.713 HYPERVISOR: exec_cmd: c7200 get_mac_addr R7 
+Feb 05 10:29:56.713 HYPERVISOR: exec_cmd: vm get_status R7 
+Feb 05 10:29:56.713 HYPERVISOR: exec_cmd: vm slot_add_binding R7 0 0 C7200-IO-FE 
+Feb 05 10:29:56.714 HYPERVISOR: exec_cmd: vm set_ios R7 C:/Users/Kille/GNS3/images/IOS/c7200-advipservicesk9-mz.152-4.S5.image 
+Feb 05 10:29:56.714 HYPERVISOR: exec_cmd: vm set_exec_area R7 64 
+Feb 05 10:29:56.715 HYPERVISOR: exec_cmd: vm set_ram R7 512 
+Feb 05 10:29:56.715 HYPERVISOR: exec_cmd: vm set_nvram R7 512 
+Feb 05 10:29:56.715 HYPERVISOR: exec_cmd: vm set_disk0 R7 0 
+Feb 05 10:29:56.716 HYPERVISOR: exec_cmd: vm get_status R7 
+Feb 05 10:29:56.716 HYPERVISOR: exec_cmd: vm slot_add_binding R7 1 0 PA-GE 
+Feb 05 10:29:56.716 HYPERVISOR: exec_cmd: vm get_status R7 
+Feb 05 10:29:56.716 HYPERVISOR: exec_cmd: vm slot_add_binding R7 2 0 PA-GE 
+Feb 05 10:29:56.716 HYPERVISOR: exec_cmd: vm get_status R7 
+Feb 05 10:29:56.717 HYPERVISOR: exec_cmd: vm slot_add_binding R7 3 0 PA-GE 
+Feb 05 10:29:56.761 HYPERVISOR: exec_cmd: vm set_ios R7 C:/Users/Kille/GNS3/images/IOS/c7200-advipservicesk9-mz.152-4.S5.image 
+Feb 05 10:29:58.326 HYPERVISOR: exec_cmd: vm set_ios R7 C:/Users/Kille/GNS3/images/IOS/c7200-advipservicesk9-mz.152-4.S5.image 
+Feb 05 10:32:00.655 HYPERVISOR: exec_cmd: nio create_udp udp-e91e1934-e650-4747-824b-d9081de06500 10037 127.0.0.1 10038 
+Feb 05 10:32:00.903 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R7 2 0 udp-e91e1934-e650-4747-824b-d9081de06500 
+Feb 05 10:32:00.904 HYPERVISOR: exec_cmd: vm get_status R7 
+Feb 05 10:33:03.653 HYPERVISOR: exec_cmd: nio create_udp udp-2b6b6431-7ede-4036-97e2-33a206005f88 10071 127.0.0.1 10072 
+Feb 05 10:33:03.655 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R7 0 0 udp-2b6b6431-7ede-4036-97e2-33a206005f88 
+Feb 05 10:33:03.655 HYPERVISOR: exec_cmd: vm get_status R7 
+Feb 05 10:33:34.219 HYPERVISOR: exec_cmd: nio create_udp udp-4836e6fa-f2f8-4f9f-883a-76d4809c774a 10083 127.0.0.1 10084 
+Feb 05 10:33:34.222 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R7 1 0 udp-4836e6fa-f2f8-4f9f-883a-76d4809c774a 
+Feb 05 10:33:34.222 HYPERVISOR: exec_cmd: vm get_status R7 

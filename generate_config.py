@@ -3,6 +3,18 @@ from ipaddress import IPv6Network, IPv6Interface
 
 class NetworkAutomator:
     def __init__(self, intent_file):
+        """
+        Initialise l'automate réseau en chargeant les données JSON de l'intention réseau
+        et en générant les allocations d'adresses IP.
+
+        :param intent_file: str - Chemin du fichier JSON contenant la topologie du réseau.
+        """
+
+        # Vérifier si le fichier existe
+        if not os.path.exists(intent_file):
+            raise FileNotFoundError(f"Le fichier {intent_file} n'existe pas.")
+
+
         with open(intent_file) as f:
             self.data = json.load(f)
         
@@ -12,7 +24,13 @@ class NetworkAutomator:
         self.generate_addressing()
 
     def generate_addressing(self):
-        """Alloue les adresses IPv6, y compris les liens inter-AS (un seul /64 partagé)."""
+        """
+        Génère l'adressage IPv6 pour chaque AS en allouant des adresses aux routeurs 
+        et en gérant les sous-réseaux intra-AS et inter-AS.
+
+        :return: None
+        """
+
         for as_info in self.data['ASes']:
             asn = as_info['asn']
             asn_str = str(asn)
@@ -21,8 +39,7 @@ class NetworkAutomator:
             loop_range = IPv6Network(self.data['subnetAllocation']['asAllocation'][asn_str]['loopbackRange'])
             self.used_subnets[asn] = set()
 
-            # ---------- Allocation des loopbacks ----------
-            # 1 IP / router dans l'AS
+            # Attribution des adresses loopback (1 par routeur)
             loopback_subnets = loop_range.subnets(new_prefix=128)
             for router_index, router in enumerate(as_info['routers'], start=1):
                 loopback_addr = loop_range.network_address + router_index
@@ -100,11 +117,16 @@ class NetworkAutomator:
                         host_index += 1
 
 
-    # ---------------------------------------------------------------------
-    #           GENERATION DE LA CONFIG
-    # ---------------------------------------------------------------------
     def generate_router_config(self, asn, router):
-        """Génère la configuration pour un routeur d'AS donné."""
+
+        """
+        Génère la configuration pour un routeur spécifique appartenant à un AS donné.
+
+        :param asn: int - Numéro de l'Autonomous System (AS) du routeur.
+        :param router: str - Nom du routeur.
+        :return: str - Configuration complète du routeur sous forme de texte.
+        """
+
         config = []
         config.append("version 15.2")
         config.append("ipv6 unicast-routing")
@@ -139,7 +161,8 @@ class NetworkAutomator:
                 if as_info['igp']['type'].upper() == "RIP":
                     config.append(" ipv6 rip RIPng enable")
                 elif as_info['igp']['type'].upper() == "OSPF":
-                    config.append(" ipv6 ospf 1 area 0")
+                    ospf_area = as_info['routers'][router].get('ospf', {}).get('area', '0.0.0.0')
+                    config.append(f" ipv6 ospf 1 area {ospf_area}")
 
             config.append("!")
             configured_interfaces.add(iface['name'])
@@ -155,7 +178,14 @@ class NetworkAutomator:
 
 
     def get_router_interfaces(self, asn, router):
-        """Retourne toutes les interfaces (loopback + physiques) du routeur."""
+        """
+        Retourne toutes les interfaces d'un routeur donné, y compris loopback et interfaces physiques.
+
+        :param asn: int - Numéro de l'AS auquel appartient le routeur.
+        :param router: str - Nom du routeur.
+        :return: list[dict] - Liste de dictionnaires contenant les interfaces et leurs adresses IPv6.
+        """
+
         asn_str = str(asn)
         interfaces = []
 
@@ -182,6 +212,14 @@ class NetworkAutomator:
         return interfaces
 
     def generate_igp_config(self, as_info, router):
+        """
+        Génère la configuration du protocole de routage interne (IGP), soit RIPng, soit OSPFv3.
+
+        :param as_info: dict - Données de l'AS extraites du JSON.
+        :param router: str - Nom du routeur concerné.
+        :return: list[str] - Liste des lignes de configuration pour l'IGP.
+        """
+
         config = []
         asn_str = str(as_info['asn'])
         igp_type = as_info['igp']['type'].upper()
@@ -201,21 +239,47 @@ class NetworkAutomator:
             loopback_ip = self.ip_allocations[f"{asn_str}_{router}"]['loopback']
             config.append(f" router-id {self.router_id_from_loopback(loopback_ip)}")
             config.append("!")
-            for iface in self.get_router_interfaces(as_info['asn'], router):
+
+            # Récupérer l'aire OSPF depuis `intent.json`
+            ospf_area = as_info['routers'][router].get('ospf', {}).get('area', '0.0.0.0')
+
+            # Dictionnaire pour stocker les coûts spécifiques aux interfaces
+            ospf_costs = {}
+
+            # Vérifier les coûts des liens pour ce routeur
+            for link in as_info.get('topology', {}).get('links', []):
+                if isinstance(link, dict) and 'cost' in link:
+                    endpoints = link["endpoints"]
+                    cost = link["cost"]
+
+                    # Vérifier si ce routeur est un des deux extrémités du lien
+                    for endpoint in endpoints:
+                        if router in endpoint:
+                            _, iface = endpoint.split(":")  # Récupère l'interface associée
+                            ospf_costs[iface] = cost  # Stocke le coût pour cette interface
+
+            # Appliquer la configuration OSPF aux interfaces du routeur
+            for iface in self.get_router_interfaces(asn, router):
                 config.append(f"interface {iface['name']}")
-                config.append(" ipv6 ospf 1 area 0")
+                config.append(f" ipv6 ospf 1 area {ospf_area}")  # ✅ Utilise l’aire du JSON
 
-                # Vérifier si un coût spécifique est défini pour ce lien
-                for link in as_info.get('topology', {}).get('links', []):
-                    if isinstance(link, dict) and 'cost' in link:
-                        if any(router in ep for ep in link["endpoints"]):
-                            cost = link["cost"]
-                            config.append(f" ipv6 ospf cost {cost}")
+                # Appliquer un coût OSPF uniquement si défini dans `topology.links`
+                if iface['name'] in ospf_costs:
+                    config.append(f" ipv6 ospf cost {ospf_costs[iface['name']]}")
 
-                config.append("!")
+                config.append("!")  # Séparation entre les interfaces
+
         return config
 
     def generate_bgp_config(self, as_info, router):
+        """
+        Génère la configuration BGP d'un routeur, en tenant compte des pairs iBGP et eBGP.
+
+        :param as_info: dict - Données de l'AS extraites du JSON.
+        :param router: str - Nom du routeur concerné.
+        :return: list[str] - Liste des lignes de configuration pour BGP.
+        """
+
         config = []
         router_id = self.router_id_from_router_name(router)
         asn_str = str(as_info['asn'])
@@ -294,7 +358,16 @@ class NetworkAutomator:
 
 
     def find_ebgp_peer_ip_physical(self, local_router, peer_router, local_asn_str, peer_asn_str):
-        """Trouver l'adresse IPv6 interAS du peer (on évite la loopback)."""
+        """
+        Trouve l'adresse IPv6 d'un peer eBGP en évitant les adresses loopback.
+
+        :param local_router: str - Nom du routeur local.
+        :param peer_router: str - Nom du routeur distant (peer eBGP).
+        :param local_asn_str: str - Numéro de l'AS local (en string).
+        :param peer_asn_str: str - Numéro de l'AS du peer (en string).
+        :return: str - Adresse IPv6 du peer eBGP.
+        """
+
         for link_id, link_data in self.ip_allocations.items():
             if not link_id.startswith("interAS_"):
                 continue
@@ -316,7 +389,13 @@ class NetworkAutomator:
         return self.ip_allocations[f"{peer_asn_str}_{peer_router}"]['loopback']
 
     def router_id_from_router_name(self, router_name):
-        """Ex: R1 -> 1.1.1.1, R2 -> 2.2.2.2, etc."""
+        """
+        Convertit un nom de routeur (ex: R1, R2) en un ID IPv4 utilisé pour OSPF/BGP.
+
+        :param router_name: str - Nom du routeur (ex: "R1").
+        :return: str - Router ID sous forme d'adresse IPv4 (ex: "1.1.1.1").
+        """
+
         try:
             num = int(router_name[1:])
             return f"{num}.{num}.{num}.{num}"
@@ -325,9 +404,12 @@ class NetworkAutomator:
 
     def router_id_from_loopback(self, loopback_ip):
         """
-        Convertit l'IPv6 (ex: 2001:db8:2::1) en pseudo router-id IPv4.
-        On prend le dernier hextet, on le convertit en int, ex: 0x1 -> 1.0.0.1
+        Convertit une adresse IPv6 de loopback en un pseudo-router ID IPv4.
+
+        :param loopback_ip: str - Adresse IPv6 du loopback du routeur.
+        :return: str - Router ID sous forme IPv4 dérivée du dernier hextet IPv6.
         """
+
         last_chunk = loopback_ip.split(':')[-1].split('/')[0]
         try:
             val = int(last_chunk, 16)

@@ -1,0 +1,32 @@
+Feb 05 10:30:03.638 HYPERVISOR: Release 0.2.17-x86/Windows (tag 2017072410)
+Feb 05 10:30:03.639 HYPERVISOR: Started on IP = localhost, TCP port = 6366.
+Feb 05 10:30:04.150 HYPERVISOR: exec_cmd: hypervisor version 
+Feb 05 10:30:04.150 HYPERVISOR: exec_cmd: hypervisor working_dir C:\Users\Kille\GNS3\projects\ProjetFinalGNS\project-files\dynamips 
+Feb 05 10:30:04.150 GENERAL: working_dir=C:\Users\Kille\GNS3\projects\ProjetFinalGNS\project-files\dynamips
+Feb 05 10:30:04.151 HYPERVISOR: exec_cmd: hypervisor working_dir C:\Users\Kille\GNS3\projects\ProjetFinalGNS\project-files\dynamips\df952b68-fba0-4c6a-9fc6-aa9833af943f 
+Feb 05 10:30:04.152 GENERAL: working_dir=C:\Users\Kille\GNS3\projects\ProjetFinalGNS\project-files\dynamips\df952b68-fba0-4c6a-9fc6-aa9833af943f
+Feb 05 10:30:04.152 HYPERVISOR: exec_cmd: vm create R10 10 c7200 
+Feb 05 10:30:04.153 VM: VM R10 created.
+Feb 05 10:30:04.153 HYPERVISOR: exec_cmd: vm set_con_tcp_port R10 5009 
+Feb 05 10:30:04.153 HYPERVISOR: exec_cmd: c7200 get_mac_addr R10 
+Feb 05 10:30:04.153 HYPERVISOR: exec_cmd: vm get_status R10 
+Feb 05 10:30:04.153 HYPERVISOR: exec_cmd: vm slot_add_binding R10 0 0 C7200-IO-FE 
+Feb 05 10:30:04.154 HYPERVISOR: exec_cmd: vm set_ios R10 C:/Users/Kille/GNS3/images/IOS/c7200-advipservicesk9-mz.152-4.S5.image 
+Feb 05 10:30:04.155 HYPERVISOR: exec_cmd: vm set_exec_area R10 64 
+Feb 05 10:30:04.155 HYPERVISOR: exec_cmd: vm set_ram R10 512 
+Feb 05 10:30:04.156 HYPERVISOR: exec_cmd: vm set_nvram R10 512 
+Feb 05 10:30:04.156 HYPERVISOR: exec_cmd: vm set_disk0 R10 0 
+Feb 05 10:30:04.157 HYPERVISOR: exec_cmd: vm get_status R10 
+Feb 05 10:30:04.157 HYPERVISOR: exec_cmd: vm slot_add_binding R10 1 0 PA-GE 
+Feb 05 10:30:04.157 HYPERVISOR: exec_cmd: vm get_status R10 
+Feb 05 10:30:04.158 HYPERVISOR: exec_cmd: vm slot_add_binding R10 2 0 PA-GE 
+Feb 05 10:30:04.158 HYPERVISOR: exec_cmd: vm get_status R10 
+Feb 05 10:30:04.158 HYPERVISOR: exec_cmd: vm slot_add_binding R10 3 0 PA-GE 
+Feb 05 10:30:04.212 HYPERVISOR: exec_cmd: vm set_ios R10 C:/Users/Kille/GNS3/images/IOS/c7200-advipservicesk9-mz.152-4.S5.image 
+Feb 05 10:30:04.990 HYPERVISOR: exec_cmd: vm set_ios R10 C:/Users/Kille/GNS3/images/IOS/c7200-advipservicesk9-mz.152-4.S5.image 
+Feb 05 10:33:42.213 HYPERVISOR: exec_cmd: nio create_udp udp-8cc630fe-7650-45ef-8ded-3d5269996568 10091 127.0.0.1 10092 
+Feb 05 10:33:42.498 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R10 0 0 udp-8cc630fe-7650-45ef-8ded-3d5269996568 
+Feb 05 10:33:42.498 HYPERVISOR: exec_cmd: vm get_status R10 
+Feb 05 10:33:49.402 HYPERVISOR: exec_cmd: nio create_udp udp-dc6850f7-3825-4ad7-bba3-f357cecc6070 10097 127.0.0.1 10098 
+Feb 05 10:33:49.406 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R10 1 0 udp-dc6850f7-3825-4ad7-bba3-f357cecc6070 
+Feb 05 10:33:49.406 HYPERVISOR: exec_cmd: vm get_status R10 
